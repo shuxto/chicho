@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-// 1. Read the secret URL from your .env.local file
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// --- CHICHO DATABASE CONFIGURATION ---
+// We are hardcoding these to ensure Vercel connects successfully immediately.
 
-// 2. Read the secret KEY from your .env.local file
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = "https://mzmtlyrdkipljquygsmx.supabase.co";
 
-// 3. Create and export the connection
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bXRseXJka2lwbGpxdXlnc214Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NjYxMTMsImV4cCI6MjA4MzA0MjExM30.2-wKQh6gdXZMsw7RbWq6xH9wAiCdMcXtz7u477hAg9o";
+
+// Export the connection for the rest of the app to use
 export const supabase = createClient(supabaseUrl, supabaseKey);
