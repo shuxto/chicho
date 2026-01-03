@@ -1,66 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { LucideCar, LucideMapPin, LucideCalendar, LucideSearch, LucideMenu, LucideX, LucideSparkles, LucideZap, LucideShield, LucideArrowRight } from 'lucide-react';
+import { supabase } from './lib/supabase'; 
+import { 
+  LucideCar, LucideMapPin, LucideSearch, LucideMenu, LucideSparkles, 
+  LucideZap, LucideShield, LucideX, LucideArrowRight, LucideCalendar, 
+  LucideSmartphone, LucideMountain, LucideInstagram, LucidePhone 
+} from 'lucide-react';
+import { Outfit } from 'next/font/google';
 
-// --- DATA (We will move this to Supabase later) ---
-const CARS = [
-  {
-    id: 1,
-    name: "Porsche 911 Carrera",
-    category: "sports",
-    price: 450,
-    image: "https://images.unsplash.com/photo-1503376763036-066120622c74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    specs: { "0-60": "3.2s", seats: "2", trans: "Auto", fuel: "Petrol" }
-  },
-  {
-    id: 2,
-    name: "Tesla Model S Plaid",
-    category: "electric",
-    price: 299,
-    image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    specs: { range: "396mi", seats: "5", trans: "Auto", fuel: "Electric" }
-  },
-  {
-    id: 3,
-    name: "Range Rover Sport",
-    category: "suv",
-    price: 350,
-    image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    specs: { bags: "4", seats: "5", trans: "Auto", fuel: "Diesel" }
-  },
-  {
-    id: 4,
-    name: "Mercedes AMG GT",
-    category: "sports",
-    price: 380,
-    image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    specs: { "0-60": "3.6s", seats: "2", trans: "Auto", fuel: "Petrol" }
-  },
-  {
-    id: 5,
-    name: "BMW X7 M50i",
-    category: "suv",
-    price: 320,
-    image: "https://images.unsplash.com/photo-1556189250-72ba95452242?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    specs: { bags: "5", seats: "7", trans: "Auto", fuel: "Diesel" }
-  },
-  {
-    id: 6,
-    name: "Audi e-tron GT",
-    category: "electric",
-    price: 280,
-    image: "https://images.unsplash.com/photo-1614200179396-2bdb77ebf81d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    specs: { range: "238mi", seats: "5", trans: "Auto", fuel: "Electric" }
-  }
-];
+// Font Setup
+const outfit = Outfit({ subsets: ['latin'] });
 
 export default function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [cars, setCars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Modal States
+  // UI States
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any>(null);
   
@@ -68,202 +25,157 @@ export default function Home() {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiInput, setAiInput] = useState("");
   const [aiMessages, setAiMessages] = useState<any[]>([
-    { role: 'ai', text: "Hello! I'm the Chicho AI. Tell me about your trip plans, and I'll recommend the perfect car." }
+    { role: 'ai', text: "Gamarjoba! I'm Chicho AI. Ask me about our cars or trips in Georgia." }
   ]);
-  const [aiLoading, setAiLoading] = useState(false);
 
-  // Scroll Effect
+  // --- CONNECT TO DB ---
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const getCars = async () => {
+      // Fetch cars from Supabase
+      const { data, error } = await supabase.from('cars').select('*').order('price', { ascending: true });
+      if (!error) setCars(data || []);
+      setLoading(false);
+    };
+    getCars();
   }, []);
 
-  // Filter Logic
-  const filteredCars = activeCategory === 'all' 
-    ? CARS 
-    : CARS.filter(car => car.category === activeCategory);
-
-  // AI Handler (Mock)
-  const handleAiSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!aiInput.trim()) return;
-
-    const userMsg = aiInput;
-    setAiMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setAiInput("");
-    setAiLoading(true);
-
-    // Simulate AI thinking delay
-    setTimeout(() => {
-        let responseText = "I recommend checking out our SUV collection for that trip.";
-        let recommendedCar = null;
-
-        if (userMsg.toLowerCase().includes("fast") || userMsg.toLowerCase().includes("sport")) {
-            responseText = "For speed and style, nothing beats the Porsche 911. Ideally suited for coastal drives.";
-            recommendedCar = CARS[0];
-        } else if (userMsg.toLowerCase().includes("family") || userMsg.toLowerCase().includes("bags")) {
-            responseText = "For a family trip with luggage, the Range Rover Sport offers the best comfort and space.";
-            recommendedCar = CARS[2];
-        } else if (userMsg.toLowerCase().includes("eco") || userMsg.toLowerCase().includes("electric")) {
-             responseText = "The Tesla Model S Plaid is perfect for eco-friendly touring with incredible range.";
-             recommendedCar = CARS[1];
-        }
-
-        const newMsg = {
-            role: 'ai',
-            text: responseText,
-            recommendation: recommendedCar
-        };
-        
-        setAiMessages(prev => [...prev, newMsg]);
-        setAiLoading(false);
-    }, 1500);
-  };
-
   return (
-    <div className="bg-slate-900 min-h-screen text-white font-sans selection:bg-indigo-500 selection:text-white">
+    <div className={`bg-black min-h-screen text-white selection:bg-indigo-500 selection:text-white ${outfit.className} relative overflow-x-hidden`}>
       
-      {/* --- NAVBAR --- */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 border-b border-white/10 ${isScrolled ? 'bg-slate-900/90 shadow-lg backdrop-blur-md' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
-                <div className="flex items-center gap-2">
-                    <LucideZap className="text-indigo-500 w-8 h-8" />
-                    <span className="text-2xl font-bold tracking-tight">CHICHO</span>
-                </div>
-                
-                {/* Desktop Menu */}
-                <div className="hidden md:block">
-                    <div className="ml-10 flex items-center space-x-8">
-                        {['Home', 'Fleet', 'Services'].map((item) => (
-                           <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-indigo-400 transition-colors px-3 py-2 text-sm font-medium">{item}</a>
-                        ))}
-                        <button 
-                            onClick={() => setAiOpen(true)}
-                            className="bg-gradient-to-r from-indigo-600 to-violet-500 hover:from-indigo-500 hover:to-violet-400 text-white px-4 py-2 rounded-full text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 flex items-center gap-2"
-                        >
-                            <LucideSparkles className="w-4 h-4" /> AI Concierge
-                        </button>
-                    </div>
-                </div>
+      {/* --- BACKGROUND AMBIENT GLOW (Boosted Visibility) --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-900/30 blur-[120px] rounded-full opacity-70"></div>
+          <div className="absolute bottom-[0%] right-[-10%] w-[50%] h-[50%] bg-violet-900/20 blur-[100px] rounded-full opacity-60"></div>
+      </div>
 
-                {/* Mobile Menu Button */}
-                <div className="md:hidden">
-                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-gray-300 hover:text-white">
-                        <LucideMenu className="w-6 h-6" />
-                    </button>
-                </div>
+      {/* --- MOBILE APP STYLE BOTTOM NAV (Visible only on Mobile) --- */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-zinc-900/90 backdrop-blur-xl border-t border-white/20 z-50 px-6 py-4 flex justify-between items-center pb-8">
+        <a href="#home" className="flex flex-col items-center text-xs gap-1 text-white"><LucideZap className="w-5 h-5" />Home</a>
+        <a href="#fleet" className="flex flex-col items-center text-xs gap-1 text-zinc-400 hover:text-white"><LucideCar className="w-5 h-5" />Cars</a>
+        <button onClick={() => setAiOpen(true)} className="flex flex-col items-center text-xs gap-1 text-indigo-400"><LucideSparkles className="w-5 h-5" />AI</button>
+        <a href="#tours" className="flex flex-col items-center text-xs gap-1 text-zinc-400 hover:text-white"><LucideMountain className="w-5 h-5" />Tours</a>
+      </div>
+
+      {/* --- HEADER (Desktop & Mobile) --- */}
+      <nav className="fixed w-full z-40 top-0 bg-black/80 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center gap-2 relative z-10">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-black font-black text-lg">C</div>
+                <span className="text-lg font-bold tracking-tight">CHICHO</span>
             </div>
+
+            {/* Desktop Nav */}
+            <div className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-300">
+                <a href="#fleet" className="hover:text-white transition-colors">Fleet</a>
+                <a href="#tours" className="hover:text-white transition-colors">Georgia Tours</a>
+                <a href="#about" className="hover:text-white transition-colors">About</a>
+                <button onClick={() => setAiOpen(true)} className="text-white bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all flex items-center gap-2 border border-white/10">
+                    <LucideSparkles className="w-4 h-4 text-indigo-400" /> AI Concierge
+                </button>
+            </div>
+
+            {/* Mobile Hamburger (Opens full menu) */}
+            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 text-white relative z-10">
+                <LucideMenu />
+            </button>
         </div>
-        
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-             <div className="md:hidden bg-slate-800 border-b border-slate-700">
-                <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    {['Home', 'Fleet', 'Services'].map((item) => (
-                        <a key={item} href={`#${item.toLowerCase()}`} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{item}</a>
-                    ))}
-                    <button onClick={() => {setAiOpen(true); setMobileMenuOpen(false);}} className="text-indigo-400 font-bold block px-3 py-2 w-full text-left flex items-center gap-2">
-                         <LucideSparkles className="w-4 h-4" /> AI Concierge
-                    </button>
-                </div>
-            </div>
-        )}
       </nav>
 
-      {/* --- HERO SECTION --- */}
-      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent z-10"></div>
-            <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Hero" className="w-full h-full object-cover" />
-        </div>
-
-        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto pt-20">
-            <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-semibold mb-6 animate-bounce">
-                ✨ Premium Fleet 2024
-            </span>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-white">
-                Drive the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">Extraordinary</span>
-            </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-300 mb-10 font-light">
-                Experience the thrill of the world's most exclusive cars. Instant booking, seamless delivery.
-            </p>
-
-            {/* Search Widget */}
-            <div className="bg-slate-800/60 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-2xl max-w-4xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="relative">
-                        <LucideMapPin className="absolute left-3 top-3.5 text-slate-400 w-5 h-5" />
-                        <input type="text" placeholder="Pick-up Location" className="w-full bg-slate-900/80 border border-slate-600 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-indigo-500" />
+      {/* --- HERO SECTION (Compact, Modern) --- */}
+      <section id="home" className="pt-32 pb-12 px-6 max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row items-end gap-8 mb-12">
+            <div className="md:w-2/3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-medium text-indigo-300 mb-6 backdrop-blur-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    Available in Tbilisi & Batumi
+                </div>
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6 drop-shadow-2xl">
+                    Explore Georgia <br/>
+                    <span className="text-zinc-500">on your terms.</span>
+                </h1>
+                <p className="text-lg text-zinc-300 max-w-lg">
+                    Premium car rentals without the hassle. Book instantly, unlock with your phone, and drive the best roads in the Caucasus.
+                </p>
+            </div>
+            
+            {/* App CTA Card */}
+            <div className="md:w-1/3 w-full">
+                <div className="bg-zinc-900 border border-white/20 p-6 rounded-3xl flex items-center justify-between group cursor-pointer hover:border-indigo-500/50 transition-all shadow-xl">
+                    <div>
+                        <p className="text-xs font-bold text-indigo-300 uppercase mb-1">Coming Soon</p>
+                        <h3 className="text-xl font-bold text-white">The Chicho App</h3>
+                        <p className="text-sm text-zinc-400 mt-1">Keyless entry & GPS tours.</p>
                     </div>
-                    <div className="relative">
-                        <LucideCalendar className="absolute left-3 top-3.5 text-slate-400 w-5 h-5" />
-                         <input type="date" className="w-full bg-slate-900/80 border border-slate-600 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-indigo-500 text-slate-400" />
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black group-hover:scale-110 transition-transform">
+                        <LucideSmartphone className="w-6 h-6" />
                     </div>
-                     <div className="relative">
-                        <LucideCalendar className="absolute left-3 top-3.5 text-slate-400 w-5 h-5" />
-                        <input type="date" className="w-full bg-slate-900/80 border border-slate-600 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-indigo-500 text-slate-400" />
-                    </div>
-                    <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl py-3 shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2">
-                        <LucideSearch className="w-5 h-5" /> Search
-                    </button>
                 </div>
             </div>
+        </div>
+
+        {/* Search Bar (Bento Style) */}
+        <div className="bg-zinc-900 border border-white/20 p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row gap-2 shadow-2xl">
+            <div className="flex-1 bg-black/50 rounded-xl md:rounded-full px-6 py-3 flex items-center gap-3 border border-white/5 focus-within:border-indigo-500/50 transition-colors">
+                <LucideMapPin className="text-zinc-400" />
+                <input type="text" placeholder="Pick-up (e.g. Tbilisi Airport)" className="bg-transparent w-full outline-none text-sm placeholder-zinc-500 text-white" />
+            </div>
+            <div className="flex-1 bg-black/50 rounded-xl md:rounded-full px-6 py-3 flex items-center gap-3 border border-white/5 focus-within:border-indigo-500/50 transition-colors">
+                <LucideCalendar className="text-zinc-400" />
+                <input type="text" placeholder="Dates" onFocus={(e) => e.target.type='date'} className="bg-transparent w-full outline-none text-sm placeholder-zinc-500 text-white" />
+            </div>
+            <button className="bg-white text-black font-bold rounded-xl md:rounded-full px-8 py-4 md:py-3 hover:bg-zinc-200 transition-colors active:scale-95 duration-200">
+                Search
+            </button>
         </div>
       </section>
 
-      {/* --- FLEET SECTION --- */}
-      <section id="fleet" className="py-24 bg-slate-900 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Premium Fleet</h2>
-                <div className="flex flex-wrap justify-center gap-4 mt-8">
-                    {['all', 'sports', 'suv', 'electric'].map(cat => (
-                        <button 
-                            key={cat}
-                            onClick={() => setActiveCategory(cat)}
-                            className={`px-6 py-2 rounded-full border transition-all capitalize ${activeCategory === cat ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-700 text-slate-400 hover:border-indigo-500'}`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
+      {/* --- FLEET SECTION (Horizontal Scroll for Mobile) --- */}
+      <section id="fleet" className="py-20 border-t border-white/10 relative z-10 bg-black/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+            <div className="px-6 mb-8 flex justify-between items-end">
+                <h2 className="text-3xl font-bold">The Fleet</h2>
+                <a href="#" className="text-sm text-indigo-400 hover:text-white">View All</a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredCars.map((car) => (
-                    <div key={car.id} className="bg-slate-800/40 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden hover:-translate-y-2 hover:border-indigo-500/50 transition-all duration-300 group">
-                        <div className="relative h-56 overflow-hidden">
-                            <img src={car.image} alt={car.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold border border-white/10 uppercase">
-                                {car.category}
-                            </div>
+            {/* Horizontal Scroll Container */}
+            <div className="flex overflow-x-auto gap-4 px-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+                {loading ? (
+                    <div className="text-zinc-500 px-6">Loading machines...</div>
+                ) : cars.map((car) => (
+                    // VISIBILITY UPDATE: Lighter Background (Zinc-900) + Stronger Border
+                    <div key={car.id} className="min-w-[85vw] md:min-w-[350px] snap-center bg-zinc-900 border border-white/15 rounded-3xl overflow-hidden hover:border-indigo-500/50 transition-all flex flex-col shadow-lg">
+                        
+                        {/* Image Container with Fallback Grey Background */}
+                        <div className="h-48 relative bg-zinc-800">
+                            <img src={car.image} className="w-full h-full object-cover" />
+                            <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase border border-white/10">{car.category}</div>
                         </div>
-                        <div className="p-6">
-                            <div className="flex justify-between items-start mb-4">
-                                <h3 className="text-xl font-bold text-white">{car.name}</h3>
-                                <div className="text-right">
-                                    <p className="text-indigo-400 font-bold text-xl">${car.price}</p>
-                                    <p className="text-slate-500 text-xs">/ day</p>
+
+                        <div className="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 className="text-xl font-bold mb-1 text-white">{car.name}</h3>
+                                <div className="flex gap-3 text-xs text-zinc-400 mb-4">
+                                    {car.specs && Object.keys(car.specs).slice(0,2).map(key => (
+                                        <span key={key}>• {car.specs[key]}</span>
+                                    ))}
                                 </div>
                             </div>
-                            
-                            <div className="grid grid-cols-2 gap-4 mb-6 text-sm text-slate-400">
-                                {Object.entries(car.specs).map(([key, val]) => (
-                                    <div key={key} className="flex items-center gap-2 capitalize">
-                                        <span className="text-slate-600">•</span> {val} {key}
-                                    </div>
-                                ))}
+                            <div className="flex items-center justify-between mt-4">
+                                <div>
+                                    <span className="text-lg font-bold text-white">${car.price}</span>
+                                    <span className="text-zinc-500 text-xs">/day</span>
+                                </div>
+                                <button 
+                                    onClick={() => { setSelectedCar(car); setBookingOpen(true); }}
+                                    className="bg-white text-black px-5 py-2 rounded-full text-sm font-bold hover:bg-indigo-500 hover:text-white transition-all active:scale-95"
+                                >
+                                    Book
+                                </button>
                             </div>
-
-                            <button 
-                                onClick={() => { setSelectedCar(car); setBookingOpen(true); }}
-                                className="w-full py-3 rounded-xl bg-white text-slate-900 font-bold hover:bg-indigo-500 hover:text-white transition-all duration-300"
-                            >
-                                Book Now
-                            </button>
                         </div>
                     </div>
                 ))}
@@ -271,118 +183,140 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SERVICES / FEATURES --- */}
-      <section id="services" className="py-24 bg-slate-800 border-t border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-                <div className="p-6">
-                    <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-500">
-                        <LucideZap className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-3">Instant Booking</h3>
-                    <p className="text-slate-400 text-sm">Skip the counter. Book via app and unlock your car instantly with your phone.</p>
+      {/* --- GEORGIA TOURS (Bento Grid) --- */}
+      <section id="tours" className="py-20 px-6 max-w-7xl mx-auto relative z-10">
+        <h2 className="text-3xl font-bold mb-8">Must See in Georgia</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[200px]">
+            {/* Card 1: Kazbegi (Large) */}
+            <div className="md:col-span-2 row-span-2 relative rounded-3xl overflow-hidden group border border-white/20 shadow-lg bg-zinc-800">
+                <img src="https://images.unsplash.com/photo-1565008576549-57569a49371d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-8">
+                    <h3 className="text-2xl font-bold text-white">Kazbegi Mountains</h3>
+                    <p className="text-zinc-300 text-sm mt-2">Drive the Military Highway. 4x4 Recommended.</p>
                 </div>
-                <div className="p-6">
-                    <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-500">
-                         <LucideShield className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-3">Fully Insured</h3>
-                    <p className="text-slate-400 text-sm">Every rental includes comprehensive insurance and 24/7 roadside assistance.</p>
-                </div>
-                <div className="p-6">
-                    <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-500">
-                         <LucideMapPin className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-3">Anywhere Delivery</h3>
-                    <p className="text-slate-400 text-sm">We deliver your chosen vehicle directly to your doorstep, airport, or hotel.</p>
-                </div>
+            </div>
+            {/* Card 2: Tbilisi */}
+            <div className="relative rounded-3xl overflow-hidden group border border-white/20 shadow-lg bg-zinc-800">
+                 <img src="https://images.unsplash.com/photo-1582121657683-1123498a4481?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                 <div className="absolute inset-0 bg-black/40 hover:bg-black/20 transition-colors flex items-end p-6">
+                    <h3 className="font-bold text-white drop-shadow-md">Old Tbilisi</h3>
+                 </div>
+            </div>
+            {/* Card 3: Batumi */}
+            <div className="relative rounded-3xl overflow-hidden group border border-white/20 shadow-lg bg-zinc-800">
+                 <img src="https://images.unsplash.com/photo-1596306499300-e27aec504066?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                 <div className="absolute inset-0 bg-black/40 hover:bg-black/20 transition-colors flex items-end p-6">
+                    <h3 className="font-bold text-white drop-shadow-md">Batumi Coast</h3>
+                 </div>
             </div>
         </div>
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="bg-slate-950 py-12 border-t border-slate-800 text-center">
-          <p className="text-slate-500">© 2024 CHICHO Rentals.</p>
+      <footer className="bg-zinc-900 border-t border-white/10 py-16 px-6 pb-24 md:pb-16 relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div>
+                <h2 className="text-2xl font-bold mb-4">CHICHO</h2>
+                <p className="text-zinc-400 text-sm">Premium car rentals in Georgia.</p>
+            </div>
+            <div>
+                <h4 className="font-bold mb-4 text-white">Company</h4>
+                <ul className="space-y-2 text-sm text-zinc-400">
+                    <li><a href="#" className="hover:text-white">About Us</a></li>
+                    <li><a href="#" className="hover:text-white">Careers</a></li>
+                    <li><a href="#" className="hover:text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 className="font-bold mb-4 text-white">Social</h4>
+                <div className="flex gap-4">
+                    <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-colors"><LucideInstagram className="w-5 h-5" /></a>
+                    <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-colors"><LucidePhone className="w-5 h-5" /></a>
+                </div>
+            </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 text-center text-xs text-zinc-500">
+            © 2026 Chicho Rentals. All rights reserved.
+        </div>
       </footer>
+
+      {/* --- MOBILE FULL MENU --- */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex flex-col p-6 animate-fade-in">
+            <div className="flex justify-between items-center mb-12">
+                <span className="text-xl font-bold text-white">Menu</span>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-white/10 rounded-full text-white"><LucideX /></button>
+            </div>
+            <nav className="flex flex-col gap-6 text-2xl font-bold text-white">
+                <a onClick={() => setMobileMenuOpen(false)} href="#home">Home</a>
+                <a onClick={() => setMobileMenuOpen(false)} href="#fleet">Our Fleet</a>
+                <a onClick={() => setMobileMenuOpen(false)} href="#tours">Georgia Tours</a>
+                <a onClick={() => setMobileMenuOpen(false)} href="#about">About Us</a>
+                <a onClick={() => setMobileMenuOpen(false)} href="#" className="text-indigo-400">Download App</a>
+            </nav>
+        </div>
+      )}
 
       {/* --- BOOKING MODAL --- */}
       {bookingOpen && selectedCar && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center sm:px-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setBookingOpen(false)}></div>
-            <div className="relative bg-slate-800 w-full max-w-lg rounded-2xl p-6 border border-slate-700 shadow-2xl">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold">Book {selectedCar.name}</h3>
-                    <button onClick={() => setBookingOpen(false)} className="text-slate-400 hover:text-white"><LucideX /></button>
-                </div>
-                <div className="space-y-4">
-                    <div className="bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-700">
-                         <span>Daily Rate</span>
-                         <span className="text-indigo-400 font-bold">${selectedCar.price}</span>
+            <div className="relative bg-zinc-900 w-full max-w-lg md:rounded-3xl rounded-t-3xl border border-white/20 p-6 animate-slide-up shadow-2xl">
+                <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6 md:hidden"></div>
+                
+                <div className="flex gap-4 mb-6">
+                    <div className="w-24 h-24 rounded-2xl bg-zinc-800 border border-white/5 overflow-hidden">
+                        <img src={selectedCar.image} className="w-full h-full object-cover" />
                     </div>
-                    <input type="text" placeholder="Full Name" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 focus:border-indigo-500 focus:outline-none text-white" />
-                    <input type="email" placeholder="Email Address" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 focus:border-indigo-500 focus:outline-none text-white" />
-                    <button onClick={() => {alert('Booking request sent!'); setBookingOpen(false);}} className="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-bold mt-4">Confirm Request</button>
+                    <div>
+                        <p className="text-xs text-indigo-400 font-bold uppercase mb-1">Reserve</p>
+                        <h3 className="text-xl font-bold text-white">{selectedCar.name}</h3>
+                        <p className="text-lg font-bold text-zinc-400">${selectedCar.price}<span className="text-sm font-normal">/day</span></p>
+                    </div>
                 </div>
+
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert('Request sent!'); setBookingOpen(false); }}>
+                    <input required type="text" placeholder="Full Name" className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white placeholder-zinc-500 focus:border-indigo-500 outline-none" />
+                    <input required type="tel" placeholder="Phone Number" className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white placeholder-zinc-500 focus:border-indigo-500 outline-none" />
+                    <button className="w-full bg-white text-black font-bold py-4 rounded-xl mt-4 active:scale-95 transition-transform hover:bg-zinc-200">
+                        Confirm Request
+                    </button>
+                </form>
             </div>
         </div>
       )}
 
       {/* --- AI CONCIERGE MODAL --- */}
       {aiOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center sm:px-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setAiOpen(false)}></div>
-            <div className="relative bg-slate-900 w-full max-w-xl rounded-2xl border border-indigo-500/30 shadow-2xl overflow-hidden flex flex-col h-[600px]">
-                {/* Header */}
-                <div className="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+            <div className="relative bg-zinc-900 w-full max-w-lg md:rounded-3xl rounded-t-3xl border border-white/20 h-[80vh] flex flex-col overflow-hidden animate-slide-up shadow-2xl">
+                <div className="p-4 border-b border-white/10 flex justify-between items-center bg-zinc-900">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center"><LucideSparkles className="w-4 h-4 text-white" /></div>
-                        <h3 className="font-bold">AI Concierge</h3>
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span className="font-bold text-white">Chicho AI</span>
                     </div>
-                    <button onClick={() => setAiOpen(false)} className="text-slate-400 hover:text-white"><LucideX /></button>
+                    <button onClick={() => setAiOpen(false)} className="text-white"><LucideX /></button>
                 </div>
-
-                {/* Chat Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/30">
                     {aiMessages.map((msg, idx) => (
-                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[85%] p-4 rounded-2xl ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-300 rounded-tl-none border border-slate-700'}`}>
-                                <p className="text-sm">{msg.text}</p>
-                                {msg.recommendation && (
-                                    <div className="mt-3 bg-slate-900 p-3 rounded-xl border border-slate-700">
-                                        <p className="text-xs text-indigo-400 font-bold mb-1">RECOMMENDATION</p>
-                                        <div className="flex gap-3 items-center">
-                                            <img src={msg.recommendation.image} className="w-12 h-12 rounded-lg object-cover" />
-                                            <div>
-                                                <p className="font-bold text-white text-sm">{msg.recommendation.name}</p>
-                                                <p className="text-xs text-slate-500">${msg.recommendation.price}/day</p>
-                                            </div>
-                                        </div>
-                                        <button onClick={() => {setAiOpen(false); setSelectedCar(msg.recommendation); setBookingOpen(true);}} className="w-full mt-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs py-2 rounded-lg transition-colors">Book This Car</button>
-                                    </div>
-                                )}
-                            </div>
+                        <div key={idx} className={`p-4 rounded-2xl text-sm max-w-[85%] ${msg.role === 'user' ? 'bg-indigo-600 ml-auto text-white' : 'bg-zinc-800 border border-white/10 mr-auto text-gray-200'}`}>
+                            {msg.text}
                         </div>
                     ))}
-                    {aiLoading && (
-                         <div className="flex justify-start">
-                            <div className="bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-700 text-slate-500 text-sm">
-                                Typing...
-                            </div>
-                        </div>
-                    )}
                 </div>
 
-                {/* Input Area */}
-                <form onSubmit={handleAiSubmit} className="p-4 bg-slate-800 border-t border-slate-700">
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if(!aiInput) return;
+                    setAiMessages(prev => [...prev, {role: 'user', text: aiInput}]);
+                    setAiInput('');
+                    setTimeout(() => setAiMessages(prev => [...prev, {role: 'ai', text: "I can check availability for that. One moment..."}]), 1000);
+                }} className="p-4 bg-zinc-900 border-t border-white/10 pb-8 md:pb-4">
                     <div className="relative">
-                        <input 
-                            value={aiInput}
-                            onChange={(e) => setAiInput(e.target.value)}
-                            type="text" 
-                            placeholder="Describe your trip..." 
-                            className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-4 pr-12 py-3 focus:border-indigo-500 focus:outline-none text-white" 
-                        />
-                        <button type="submit" className="absolute right-2 top-2 p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white"><LucideArrowRight className="w-4 h-4" /></button>
+                        <input value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder="Message..." className="w-full bg-black border border-white/10 rounded-full pl-5 pr-12 py-3 focus:border-indigo-500 outline-none text-white placeholder-zinc-500" />
+                        <button className="absolute right-2 top-2 p-1.5 bg-indigo-600 rounded-full text-white"><LucideArrowRight className="w-4 h-4" /></button>
                     </div>
                 </form>
             </div>
