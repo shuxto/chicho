@@ -59,13 +59,11 @@ export default function CarDetailsPage() {
   if (loading) return <div className="bg-[#0f172a] min-h-screen text-white flex items-center justify-center">Loading Machine...</div>;
   if (!car) return <div className="bg-[#0f172a] min-h-screen text-white flex items-center justify-center">Car not found.</div>;
 
-  // --- MOCK GALLERY IMAGES (Since DB has only 1 image) ---
-  const galleryImages = [
-      car.image,
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000&auto=format&fit=crop", // Generic Steering Wheel
-      "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1000&auto=format&fit=crop", // Generic Road
-      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=1000&auto=format&fit=crop"  // Generic Interior
-  ];
+  // --- FIX: USE REAL GALLERY IMAGES ONLY ---
+  // If car.gallery exists and has items, use it. Otherwise, just use the main image.
+  const galleryImages = (car.gallery && Array.isArray(car.gallery) && car.gallery.length > 0)
+    ? car.gallery 
+    : [car.image];
 
   const openLightbox = (index: number) => {
       setCurrentImageIndex(index);
@@ -90,7 +88,7 @@ export default function CarDetailsPage() {
           
           {/* Main Image (Click to Zoom) */}
           <div className="relative w-full lg:w-2/3 h-[50vh] lg:h-full bg-slate-900 cursor-zoom-in" onClick={() => openLightbox(0)}>
-              <img src={car.image} className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
+              <img src={car.image} className="w-full h-full object-cover hover:opacity-90 transition-opacity" alt={car.name} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent lg:bg-gradient-to-r pointer-events-none"></div>
               <div className="absolute bottom-6 left-6 bg-black/50 backdrop-blur px-3 py-1 rounded-full text-xs font-bold pointer-events-none">
                   Click to Expand
@@ -138,13 +136,13 @@ export default function CarDetailsPage() {
           </div>
       </div>
 
-      {/* --- NEW: PHOTO GALLERY SECTION --- */}
+      {/* --- PHOTO GALLERY SECTION --- */}
       <section className="px-6 py-12 max-w-7xl mx-auto border-t border-white/5">
           <h2 className="text-2xl font-bold mb-8">Gallery</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {galleryImages.map((img, index) => (
+              {galleryImages.map((img: string, index: number) => (
                   <div key={index} onClick={() => openLightbox(index)} className="aspect-square bg-slate-800 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer hover:border-teal-500/50 transition-all">
-                      <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={`${car.name} gallery ${index}`} />
                   </div>
               ))}
           </div>
@@ -158,7 +156,7 @@ export default function CarDetailsPage() {
                   {similarCars.map((sim) => (
                       <Link href={`/fleet/${sim.id}`} key={sim.id} className="group bg-slate-800/40 border border-white/10 rounded-2xl overflow-hidden hover:border-teal-500/40 transition-all">
                           <div className="h-40 relative">
-                              <img src={sim.image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                              <img src={sim.image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={sim.name} />
                           </div>
                           <div className="p-4">
                               <h3 className="font-bold text-lg mb-1 group-hover:text-teal-400 transition-colors">{sim.name}</h3>
@@ -206,7 +204,8 @@ export default function CarDetailsPage() {
                   <img 
                     src={galleryImages[currentImageIndex]} 
                     className="max-h-[90vh] max-w-full object-contain rounded-lg shadow-2xl"
-                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image
+                    onClick={(e) => e.stopPropagation()} 
+                    alt="Lightbox view"
                   />
               </div>
 
@@ -217,9 +216,8 @@ export default function CarDetailsPage() {
                   <LucideChevronRight className="w-8 h-8" />
               </button>
 
-              {/* Dots Indicator */}
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-                  {galleryImages.map((_, idx) => (
+                  {galleryImages.map((_: any, idx: number) => (
                       <div 
                         key={idx} 
                         className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white w-4' : 'bg-white/30'}`}
