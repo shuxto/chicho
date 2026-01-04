@@ -4,24 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase'; 
 import Link from 'next/link';
 import { 
-  LucideCar, LucideMapPin, LucideSearch, LucideMenu, LucideSparkles, 
-  LucideZap, LucideShield, LucideX, LucideArrowRight, LucideCalendar, 
-  LucideSmartphone, LucideMountain, LucideInstagram, LucidePhone, LucideGlobe
+  LucideMapPin, LucideArrowRight, LucideCalendar, 
+  LucideZap, LucideShield, LucideFilter
 } from 'lucide-react';
-import { Outfit } from 'next/font/google';
-
-// Font Setup
-const outfit = Outfit({ subsets: ['latin'] });
 
 // --- TRANSLATIONS CONFIGURATION ---
 type LangKey = 'en' | 'ru' | 'ka' | 'he' | 'ar';
 
 const TRANSLATIONS = {
   en: {
-    nav_fleet: "Fleet",
-    nav_tours: "Georgia Tours",
-    nav_about: "About Us",
-    nav_contact: "Contact",
     hero_badge: "Live in Tbilisi & Batumi",
     hero_title_1: "Drive the",
     hero_title_2: "Extraordinary.",
@@ -37,15 +28,10 @@ const TRANSLATIONS = {
     fleet_book: "Book",
     tours_title: "Must See in Georgia",
     tour_btn: "Start Discovery",
-    footer_desc: "Premium car rentals in Georgia.",
-    footer_company: "Company",
-    footer_social: "Social",
     modal_reserve: "Reserve",
     modal_name: "Full Name",
     modal_phone: "Phone Number",
     modal_confirm: "Confirm Request",
-    ai_welcome: "Gamarjoba! I'm Chicho AI. Ask me about our cars or trips in Georgia.",
-    coming_soon: "Coming Soon",
     app_title: "Unlock the road.",
     app_desc: "Manage your bookings, unlock cars keylessly, and track your trips all in one place.",
     features_title: "Why Choose Chicho",
@@ -60,10 +46,6 @@ const TRANSLATIONS = {
     about_btn: "Read Our Story"
   },
   ru: {
-    nav_fleet: "Автопарк",
-    nav_tours: "Туры",
-    nav_about: "О нас",
-    nav_contact: "Контакты",
     hero_badge: "Работаем в Тбилиси и Батуми",
     hero_title_1: "Управляй",
     hero_title_2: "Мечтой.",
@@ -79,15 +61,10 @@ const TRANSLATIONS = {
     fleet_book: "Бронь",
     tours_title: "Места для посещения",
     tour_btn: "Открыть Грузию",
-    footer_desc: "Премиум прокат авто в Грузии.",
-    footer_company: "Компания",
-    footer_social: "Соцсети",
     modal_reserve: "Забронировать",
     modal_name: "ФИО",
     modal_phone: "Телефон",
     modal_confirm: "Подтвердить",
-    ai_welcome: "Гамаржоба! Я Chicho AI. Спросите меня об авто или турах.",
-    coming_soon: "Скоро",
     app_title: "Приложение Chicho",
     app_desc: "Бесключевой доступ и GPS туры.",
     features_title: "Почему Chicho",
@@ -102,10 +79,6 @@ const TRANSLATIONS = {
     about_btn: "Наша история"
   },
   ka: {
-    nav_fleet: "ავტოპარკი",
-    nav_tours: "ტურები",
-    nav_about: "ჩვენ შესახებ",
-    nav_contact: "კონტაქტი",
     hero_badge: "თბილისსა და ბათუმში",
     hero_title_1: "მართე",
     hero_title_2: "გამორჩეული.",
@@ -121,15 +94,10 @@ const TRANSLATIONS = {
     fleet_book: "ჯავშანი",
     tours_title: "აუცილებლად სანახავი",
     tour_btn: "აღმოაჩინე საქართველო",
-    footer_desc: "პრემიუმ ავტო გაქირავება.",
-    footer_company: "კომპანია",
-    footer_social: "სოც. ქსელები",
     modal_reserve: "დაჯავშნა",
     modal_name: "სახელი გვარი",
     modal_phone: "ნომერი",
     modal_confirm: "დადასტურება",
-    ai_welcome: "გამარჯობა! მე ვარ Chicho AI. მკითხეთ მანქანებზე ან ტურებზე.",
-    coming_soon: "მალე",
     app_title: "Chicho აპლიკაცია",
     app_desc: "გასაღების გარეშე წვდომა და GPS.",
     features_title: "რატომ Chicho",
@@ -144,10 +112,6 @@ const TRANSLATIONS = {
     about_btn: "ჩვენი ისტორია"
   },
   he: {
-    nav_fleet: "צי הרכב",
-    nav_tours: "טיולים",
-    nav_about: "עלינו",
-    nav_contact: "צור קשר",
     hero_badge: "זמין בטביליסי ובאטומי",
     hero_title_1: "נהג ב",
     hero_title_2: "יוצא דופן.",
@@ -163,15 +127,10 @@ const TRANSLATIONS = {
     fleet_book: "הזמן",
     tours_title: "חובה לראות בגאורגיה",
     tour_btn: "התחל לגלות",
-    footer_desc: "השכרת רכב פרימיום בגאורגיה.",
-    footer_company: "חברה",
-    footer_social: "חברתי",
     modal_reserve: "שריון",
     modal_name: "שם מלא",
     modal_phone: "מספר טלפון",
     modal_confirm: "אשר בקשה",
-    ai_welcome: "גמרג'ובה! אני Chicho AI. שאל אותי על רכבים או טיולים.",
-    coming_soon: "בקרוב",
     app_title: "אפליקציית Chicho",
     app_desc: "כניסה ללא מפתח וסיורי GPS.",
     features_title: "למה לבחור בנו",
@@ -186,10 +145,6 @@ const TRANSLATIONS = {
     about_btn: "הסיפור שלנו"
   },
   ar: {
-    nav_fleet: "الأسطول",
-    nav_tours: "جولات جورجيا",
-    nav_about: "معلومات عنا",
-    nav_contact: "اتصل بنا",
     hero_badge: "متاح في تبليسي وباتومي",
     hero_title_1: "قُد",
     hero_title_2: "الاستثنائي.",
@@ -205,15 +160,10 @@ const TRANSLATIONS = {
     fleet_book: "احجز",
     tours_title: "يجب رؤيته في جورجيا",
     tour_btn: "ابدأ الاكتشاف",
-    footer_desc: "تأجير سيارات فاخرة في جورجيا.",
-    footer_company: "الشركة",
-    footer_social: "تواصل اجتماعي",
     modal_reserve: "حجز",
     modal_name: "الاسم الكامل",
     modal_phone: "رقم الهاتف",
     modal_confirm: "تأكيد الطلب",
-    ai_welcome: "غامارجوبا! أنا Chicho AI. اسألني عن السيارات أو الرحلات.",
-    coming_soon: "قريباً",
     app_title: "تطبيق Chicho",
     app_desc: "دخول بدون مفتاح وجولات GPS.",
     features_title: "لماذا تختارنا",
@@ -233,21 +183,12 @@ export default function Home() {
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Language State
+  // Language State (Still needed for the body text)
   const [lang, setLang] = useState<LangKey>('en');
-  const [langMenuOpen, setLangMenuOpen] = useState(false);
   
   // UI States
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any>(null);
-  
-  // AI States
-  const [aiOpen, setAiOpen] = useState(false);
-  const [aiInput, setAiInput] = useState("");
-  const [aiMessages, setAiMessages] = useState<any[]>([
-    { role: 'ai', text: TRANSLATIONS['en'].ai_welcome }
-  ]);
 
   // Derived Values
   const t = TRANSLATIONS[lang];
@@ -256,17 +197,12 @@ export default function Home() {
   // --- PERSIST LANGUAGE ---
   useEffect(() => {
     // Load language from LocalStorage on start
+    // Note: The Header handles switching it, this just reads it on load.
     const savedLang = localStorage.getItem('chicho_lang') as LangKey;
     if (savedLang && TRANSLATIONS[savedLang]) {
       setLang(savedLang);
     }
   }, []);
-
-  const switchLanguage = (newLang: LangKey) => {
-    setLang(newLang);
-    localStorage.setItem('chicho_lang', newLang); // Save to storage
-    setLangMenuOpen(false);
-  };
 
   // --- CONNECT TO DB ---
   useEffect(() => {
@@ -278,13 +214,8 @@ export default function Home() {
     getCars();
   }, []);
 
-  // Update AI welcome message when language changes
-  useEffect(() => {
-    setAiMessages([{ role: 'ai', text: t.ai_welcome }]);
-  }, [lang]);
-
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className={`bg-[#0f172a] min-h-screen text-white selection:bg-teal-500 selection:text-white ${outfit.className} relative overflow-x-hidden`}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen text-white relative overflow-x-hidden">
       
       {/* --- BACKGROUND IMAGE & OVERLAY (Fixed for Visibility) --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -293,98 +224,16 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/95 to-[#0f172a]/90"></div>
       </div>
 
-      {/* --- MOBILE APP BOTTOM NAV (Solid Background) --- */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#0f172a] border-t border-slate-800 z-50 px-6 py-4 flex justify-between items-center pb-8 shadow-2xl">
-        <a href="#home" className="flex flex-col items-center text-xs gap-1 text-teal-400"><LucideZap className="w-5 h-5" /></a>
-        <a href="#fleet" className="flex flex-col items-center text-xs gap-1 text-slate-400 hover:text-white"><LucideCar className="w-5 h-5" /></a>
-        <button onClick={() => setAiOpen(true)} className="flex flex-col items-center text-xs gap-1 text-white bg-gradient-to-r from-teal-500 to-cyan-500 p-3 -mt-6 rounded-full shadow-lg shadow-teal-500/20"><LucideSparkles className="w-5 h-5" /></button>
-        <Link href="/tours" className="flex flex-col items-center text-xs gap-1 text-slate-400 hover:text-white"><LucideMountain className="w-5 h-5" /></Link>
-        {/* Mobile Lang Toggle */}
-        <button 
-            onClick={() => {
-                const langs: LangKey[] = ['en', 'ru', 'ka', 'he', 'ar'];
-                const next = langs[(langs.indexOf(lang) + 1) % langs.length];
-                switchLanguage(next);
-            }} 
-            className="flex flex-col items-center text-xs gap-1 text-slate-400 hover:text-white uppercase font-bold"
-        >
-            <div className="w-5 h-5 flex items-center justify-center border border-slate-600 rounded-full text-[10px]">{lang.toUpperCase()}</div>
-        </button>
-      </div>
-
-      {/* --- HEADER (Desktop & Mobile - Solid) --- */}
-      <nav className="fixed w-full z-40 top-0 bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-2 relative z-10">
-                <img 
-                    src="/logo.png" 
-                    alt="Chicho Logo" 
-                    className="h-10 w-auto object-contain" 
-                />
-                <span className="text-lg font-bold tracking-tight text-white">CHICHO</span>
-            </div>
-
-            {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="#fleet" className="hover:text-teal-400 transition-colors">{t.nav_fleet}</a>
-                <Link href="/tours" className="hover:text-teal-400 transition-colors">{t.nav_tours}</Link>
-                <Link href="/about" className="hover:text-teal-400 transition-colors">{t.nav_about}</Link>
-                <Link href="/contact" className="hover:text-teal-400 transition-colors">{t.nav_contact}</Link>
-                
-                {/* Language Switcher Desktop */}
-                <div className="relative">
-                    <button onClick={() => setLangMenuOpen(!langMenuOpen)} className="flex items-center gap-1 hover:text-white uppercase font-bold">
-                        <LucideGlobe className="w-4 h-4" /> {lang}
-                    </button>
-                    {langMenuOpen && (
-                        <div className="absolute top-full right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col w-32 shadow-xl z-50">
-                            {(['en', 'ru', 'ka', 'he', 'ar'] as LangKey[]).map((l) => (
-                                <button 
-                                    key={l} 
-                                    onClick={() => switchLanguage(l)}
-                                    className={`px-4 py-2 text-left hover:bg-slate-800 flex items-center gap-2 ${lang === l ? 'text-teal-400' : 'text-slate-300'}`}
-                                >
-                                    <span className="uppercase text-xs font-bold">{l}</span>
-                                    {l === 'en' && '🇺🇸'}
-                                    {l === 'ru' && '🇷🇺'}
-                                    {l === 'ka' && '🇬🇪'}
-                                    {l === 'he' && '🇮🇱'}
-                                    {l === 'ar' && '🇸🇦'}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <button onClick={() => setAiOpen(true)} className="text-white bg-slate-800 px-4 py-2 rounded-full hover:bg-slate-700 transition-all flex items-center gap-2 border border-slate-700 ml-4">
-                    <LucideSparkles className="w-4 h-4 text-teal-400" /> AI
-                </button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 text-white relative z-10">
-                <LucideMenu />
-            </button>
-        </div>
-      </nav>
-
-      {/* --- HERO SECTION (Compact 500px, Your Custom Image) --- */}
-      <div className="relative w-full h-[500px] flex items-center bg-[#0f172a]">
-        
+      {/* --- HERO SECTION --- */}
+      <div className="relative w-full h-[500px] flex items-center">
         {/* 1. BACKGROUND IMAGE & OVERLAY */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-            {/* The Image - Crisp and Clear */}
             <img 
                 src="/hero-bg.jpg" 
                 alt="Luxury Car Background" 
                 className="w-full h-full object-cover"
             />
-            
-            {/* The Overlay - Dark layer to make text readable */}
             <div className="absolute inset-0 bg-black/60"></div>
-            
-            {/* Optional: Subtle gradient at the bottom to blend into the next section */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
         </div>
 
@@ -427,7 +276,7 @@ export default function Home() {
         </section>
       </div>
 
-      {/* --- FLEET SECTION (Slightly Lighter Dark BG) --- */}
+      {/* --- FLEET SECTION --- */}
       <section id="fleet" className="py-20 border-t border-slate-800 relative z-10 bg-slate-900">
         <div className="max-w-7xl mx-auto">
             <div className="px-6 mb-12 flex justify-between items-end">
@@ -437,14 +286,12 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* --- NEW GRID LAYOUT (Solid Cards) --- */}
+            {/* --- GRID LAYOUT --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
                 {loading ? (
                     <div className="text-slate-500 col-span-full text-center py-12">{t.fleet_loading}</div>
                 ) : cars.slice(0, 9).map((car) => (
-                    // CARD STYLE: SOLID BACKGROUND (Slate-800)
                     <div key={car.id} className="bg-slate-800 border border-slate-700 rounded-3xl overflow-hidden hover:border-teal-500/40 transition-all flex flex-col shadow-xl group hover:-translate-y-2 duration-300">
-                        {/* LINK TO DETAILS PAGE */}
                         <Link href={`/fleet/${car.id}`} className="block h-52 relative bg-slate-900 cursor-pointer">
                             <img src={car.image} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
@@ -488,7 +335,7 @@ export default function Home() {
         </div>
       </section>
 
-{/* --- SERVICES / FEATURES SECTION (Classic Solid) --- */}
+      {/* --- SERVICES / FEATURES SECTION --- */}
       <section className="py-24 px-6 max-w-7xl mx-auto bg-[#0f172a]">
           <div className="text-center mb-16">
               <h2 className="text-4xl font-black text-white uppercase tracking-wider">{t.features_title}</h2>
@@ -530,7 +377,7 @@ export default function Home() {
           </div>
       </section>
 
-      {/* --- TEASER SECTION (Solid BG & Re-designed) --- */}
+      {/* --- TEASER SECTION --- */}
       <section className="py-20 px-6 max-w-7xl mx-auto relative z-10">
         <div className="relative rounded-3xl overflow-hidden h-[500px] group border border-slate-700 shadow-2xl">
             {/* Background Image */}
@@ -554,7 +401,7 @@ export default function Home() {
         </div>
       </section>
 
-{/* --- ABOUT US SECTION (Direct & Bold) --- */}
+      {/* --- ABOUT US SECTION --- */}
       <section className="py-24 px-6 max-w-7xl mx-auto text-center">
           <div className="bg-teal-900/20 border-2 border-teal-500/50 rounded-3xl p-10 md:p-20">
               <h2 className="text-4xl md:text-5xl font-black mb-8 text-white tracking-tight uppercase">
@@ -569,7 +416,7 @@ export default function Home() {
           </div>
       </section>
 
-      {/* --- APP DOWNLOAD BANNER (RESTORED TO ORIGINAL HTML STYLE) --- */}
+      {/* --- APP DOWNLOAD BANNER --- */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-teal-600"></div>
         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
@@ -610,50 +457,7 @@ export default function Home() {
         </div>
     </section>
 
-      {/* --- FOOTER (Solid) --- */}
-      <footer className="bg-slate-950 border-t border-slate-800 py-16 px-6 pb-24 md:pb-16 relative z-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div>
-                <h2 className="text-2xl font-bold mb-4 text-white">CHICHO</h2>
-                <p className="text-slate-400 text-sm">{t.footer_desc}</p>
-            </div>
-            <div>
-                <h4 className="font-bold mb-4 text-white">{t.footer_company}</h4>
-                <ul className="space-y-2 text-sm text-slate-400">
-                    <li><Link href="/about" className="hover:text-teal-400">{t.nav_about}</Link></li>
-                    <li><Link href="/contact" className="hover:text-teal-400">{t.nav_contact}</Link></li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="font-bold mb-4 text-white">{t.footer_social}</h4>
-                <div className="flex gap-4">
-                    <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-teal-500 hover:text-white transition-colors text-slate-400"><LucideInstagram className="w-5 h-5" /></a>
-                    <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-teal-500 hover:text-white transition-colors text-slate-400"><LucidePhone className="w-5 h-5" /></a>
-                </div>
-            </div>
-        </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
-            © 2026 Chicho Rentals. All rights reserved.
-        </div>
-      </footer>
-
-      {/* --- MOBILE FULL MENU (Solid) --- */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] bg-[#0f172a] flex flex-col p-6 animate-fade-in">
-            <div className="flex justify-between items-center mb-12">
-                <span className="text-xl font-bold text-white">Menu</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-slate-800 rounded-full text-white"><LucideX /></button>
-            </div>
-            <nav className="flex flex-col gap-6 text-2xl font-bold text-white">
-                <a onClick={() => setMobileMenuOpen(false)} href="#home">{t.nav_fleet}</a>
-                <Link onClick={() => setMobileMenuOpen(false)} href="/tours">{t.nav_tours}</Link>
-                <Link onClick={() => setMobileMenuOpen(false)} href="/about">{t.nav_about}</Link>
-                <Link onClick={() => setMobileMenuOpen(false)} href="/contact">{t.nav_contact}</Link>
-            </nav>
-        </div>
-      )}
-
-      {/* --- BOOKING MODAL --- */}
+      {/* --- BOOKING MODAL (Kept local for now) --- */}
       {bookingOpen && selectedCar && (
         <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center sm:px-4">
             <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setBookingOpen(false)}></div>
@@ -673,41 +477,6 @@ export default function Home() {
                     <input required type="text" placeholder={t.modal_name} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:border-teal-500 outline-none" />
                     <input required type="tel" placeholder={t.modal_phone} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:border-teal-500 outline-none" />
                     <button className="w-full bg-white text-black font-bold py-4 rounded-xl mt-4 active:scale-95 transition-transform hover:bg-teal-50">{t.modal_confirm}</button>
-                </form>
-            </div>
-        </div>
-      )}
-
-      {/* --- AI MODAL --- */}
-      {aiOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center sm:px-4">
-            <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setAiOpen(false)}></div>
-            <div className="relative bg-slate-900 w-full max-w-lg md:rounded-3xl rounded-t-3xl border border-slate-700 h-[80vh] flex flex-col overflow-hidden animate-slide-up shadow-2xl">
-                <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></div>
-                        <span className="font-bold text-white">Chicho AI</span>
-                    </div>
-                    <button onClick={() => setAiOpen(false)} className="text-white"><LucideX /></button>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950">
-                    {aiMessages.map((msg, idx) => (
-                        <div key={idx} className={`p-4 rounded-2xl text-sm max-w-[85%] ${msg.role === 'user' ? 'bg-teal-600 ml-auto text-white' : 'bg-slate-800 border border-slate-700 mr-auto text-slate-200'}`}>
-                            {msg.text}
-                        </div>
-                    ))}
-                </div>
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    if(!aiInput) return;
-                    setAiMessages(prev => [...prev, {role: 'user', text: aiInput}]);
-                    setAiInput('');
-                    setTimeout(() => setAiMessages(prev => [...prev, {role: 'ai', text: "I can check availability for that. One moment..."}]), 1000);
-                }} className="p-4 bg-slate-900 border-t border-slate-700 pb-8 md:pb-4">
-                    <div className="relative">
-                        <input value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder="Message..." className="w-full bg-slate-800 border border-slate-700 rounded-full pl-5 pr-12 py-3 focus:border-teal-500 outline-none text-white placeholder-slate-500" />
-                        <button className="absolute right-2 top-2 p-1.5 bg-teal-600 rounded-full text-white"><LucideArrowRight className="w-4 h-4" /></button>
-                    </div>
                 </form>
             </div>
         </div>
