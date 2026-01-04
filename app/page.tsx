@@ -317,7 +317,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2 relative z-10">
-                <div className="w-8 h-8 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-lg flex items-center justify-center text-black font-black text-lg shadow-lg shadow-teal-500/20">C</div>
+                <img 
+                    src="/logo.png" 
+                    alt="Chicho Logo" 
+                    className="h-10 w-auto object-contain" 
+                />
                 <span className="text-lg font-bold tracking-tight text-white">CHICHO</span>
             </div>
 
@@ -365,42 +369,63 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- HERO SECTION (Dark BG) --- */}
-      <section id="home" className="pt-32 pb-12 px-6 max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row items-end gap-8 mb-12">
-            <div className="w-full">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-500/30 bg-teal-500/10 text-xs font-medium text-teal-300 mb-6 backdrop-blur-sm shadow-[0_0_15px_rgba(20,184,166,0.2)]">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
-                    </span>
-                    {t.hero_badge}
-                </div>
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6 drop-shadow-2xl text-white">
-                    {t.hero_title_1} <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-300">{t.hero_title_2}</span>
-                </h1>
-                <p className="text-lg text-slate-300 max-w-lg">
-                    {t.hero_desc}
-                </p>
-            </div>
+      {/* --- HERO SECTION (Compact 500px, Your Custom Image) --- */}
+      <div className="relative w-full h-[500px] flex items-center bg-[#0f172a]">
+        
+        {/* 1. BACKGROUND IMAGE & OVERLAY */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+            {/* The Image - Crisp and Clear */}
+            <img 
+                src="/hero-bg.jpg" 
+                alt="Luxury Car Background" 
+                className="w-full h-full object-cover"
+            />
+            
+            {/* The Overlay - Dark layer to make text readable */}
+            <div className="absolute inset-0 bg-black/60"></div>
+            
+            {/* Optional: Subtle gradient at the bottom to blend into the next section */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
         </div>
 
-        {/* Search Bar - Solid */}
-        <div className="bg-slate-800 border border-slate-700 p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row gap-2 shadow-2xl">
-            <div className="flex-1 bg-slate-900 rounded-xl md:rounded-full px-6 py-3 flex items-center gap-3 border border-slate-800 focus-within:border-teal-500/50 transition-colors">
-                <LucideMapPin className="text-teal-400 shrink-0" />
-                <input type="text" placeholder={t.search_pickup} className="bg-transparent w-full outline-none text-sm placeholder-slate-400 text-white" />
+        {/* 2. CONTENT */}
+        <section id="home" className="relative z-10 w-full max-w-7xl mx-auto px-6 mt-16">
+            <div className="flex flex-col md:flex-row items-end gap-8 mb-8">
+                <div className="w-full md:w-2/3">
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-500/30 bg-teal-900/40 text-xs font-medium text-teal-300 mb-4 backdrop-blur-sm shadow-lg">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                        </span>
+                        {t.hero_badge}
+                    </div>
+                    {/* Title */}
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight mb-4 drop-shadow-2xl text-white">
+                        {t.hero_title_1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-300">{t.hero_title_2}</span>
+                    </h1>
+                    <p className="text-base text-white max-w-lg drop-shadow-md font-medium">
+                        {t.hero_desc}
+                    </p>
+                </div>
             </div>
-            <div className="flex-1 bg-slate-900 rounded-xl md:rounded-full px-6 py-3 flex items-center gap-3 border border-slate-800 focus-within:border-teal-500/50 transition-colors">
-                <LucideCalendar className="text-teal-400 shrink-0" />
-                <input type="text" placeholder={t.search_dates} onFocus={(e) => e.target.type='date'} className="bg-transparent w-full outline-none text-sm placeholder-slate-400 text-white" />
+
+            {/* Search Bar - Compact */}
+            <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700 p-2 rounded-xl flex flex-col md:flex-row gap-2 shadow-2xl max-w-3xl shadow-teal-900/20">
+                <div className="flex-1 bg-slate-900/50 rounded-lg px-4 py-2 flex items-center gap-3 border border-slate-700 focus-within:border-teal-500/50 transition-colors">
+                    <LucideMapPin className="text-teal-400 w-5 h-5 shrink-0" />
+                    <input type="text" placeholder={t.search_pickup} className="bg-transparent w-full outline-none text-sm text-white placeholder-slate-400" />
+                </div>
+                <div className="flex-1 bg-slate-900/50 rounded-lg px-4 py-2 flex items-center gap-3 border border-slate-700 focus-within:border-teal-500/50 transition-colors">
+                    <LucideCalendar className="text-teal-400 w-5 h-5 shrink-0" />
+                    <input type="text" placeholder={t.search_dates} onFocus={(e) => e.target.type='date'} className="bg-transparent w-full outline-none text-sm text-white placeholder-slate-400" />
+                </div>
+                <button className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-bold rounded-lg px-6 py-2 hover:shadow-lg hover:shadow-teal-500/20 transition-all active:scale-95 duration-200 shrink-0 border border-teal-500/20">
+                    {t.search_btn}
+                </button>
             </div>
-            <button className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-bold rounded-xl md:rounded-full px-8 py-4 md:py-3 hover:shadow-lg hover:shadow-teal-500/20 transition-all active:scale-95 duration-200 shrink-0">
-                {t.search_btn}
-            </button>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* --- FLEET SECTION (Slightly Lighter Dark BG) --- */}
       <section id="fleet" className="py-20 border-t border-slate-800 relative z-10 bg-slate-900">
@@ -463,32 +488,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SERVICES / FEATURES SECTION (Darker BG) --- */}
-      <section className="py-24 px-6 max-w-7xl mx-auto border-t border-slate-800 bg-[#0f172a]">
+{/* --- SERVICES / FEATURES SECTION (Classic Solid) --- */}
+      <section className="py-24 px-6 max-w-7xl mx-auto bg-[#0f172a]">
           <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold">{t.features_title}</h2>
+              <h2 className="text-4xl font-black text-white uppercase tracking-wider">{t.features_title}</h2>
           </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 flex flex-col items-center text-center hover:border-teal-500/30 transition-all shadow-lg">
-                  <div className="w-16 h-16 bg-teal-500/10 rounded-full flex items-center justify-center text-teal-400 mb-6">
+              {/* Feature 1 */}
+              <div className="bg-black border-2 border-slate-700 p-8 rounded-2xl shadow-xl flex flex-col items-center text-center hover:border-teal-500 transition-colors">
+                  <div className="w-16 h-16 bg-teal-600 rounded-xl flex items-center justify-center text-white mb-6">
                       <LucideZap className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{t.feat_1_title}</h3>
-                  <p className="text-slate-400 text-sm">{t.feat_1_desc}</p>
+                  <h3 className="text-xl font-bold mb-4 text-white uppercase">{t.feat_1_title}</h3>
+                  <p className="text-white text-lg font-medium leading-relaxed">
+                      {t.feat_1_desc}
+                  </p>
               </div>
-              <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 flex flex-col items-center text-center hover:border-teal-500/30 transition-all shadow-lg">
-                  <div className="w-16 h-16 bg-teal-500/10 rounded-full flex items-center justify-center text-teal-400 mb-6">
+
+              {/* Feature 2 */}
+              <div className="bg-black border-2 border-slate-700 p-8 rounded-2xl shadow-xl flex flex-col items-center text-center hover:border-teal-500 transition-colors">
+                  <div className="w-16 h-16 bg-teal-600 rounded-xl flex items-center justify-center text-white mb-6">
                       <LucideShield className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{t.feat_2_title}</h3>
-                  <p className="text-slate-400 text-sm">{t.feat_2_desc}</p>
+                  <h3 className="text-xl font-bold mb-4 text-white uppercase">{t.feat_2_title}</h3>
+                  <p className="text-white text-lg font-medium leading-relaxed">
+                      {t.feat_2_desc}
+                  </p>
               </div>
-              <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 flex flex-col items-center text-center hover:border-teal-500/30 transition-all shadow-lg">
-                  <div className="w-16 h-16 bg-teal-500/10 rounded-full flex items-center justify-center text-teal-400 mb-6">
+
+              {/* Feature 3 */}
+              <div className="bg-black border-2 border-slate-700 p-8 rounded-2xl shadow-xl flex flex-col items-center text-center hover:border-teal-500 transition-colors">
+                  <div className="w-16 h-16 bg-teal-600 rounded-xl flex items-center justify-center text-white mb-6">
                       <LucideMapPin className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{t.feat_3_title}</h3>
-                  <p className="text-slate-400 text-sm">{t.feat_3_desc}</p>
+                  <h3 className="text-xl font-bold mb-4 text-white uppercase">{t.feat_3_title}</h3>
+                  <p className="text-white text-lg font-medium leading-relaxed">
+                      {t.feat_3_desc}
+                  </p>
               </div>
           </div>
       </section>
@@ -517,15 +554,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- ABOUT US TEASER (Solid Card) --- */}
-      <section className="py-20 px-6 max-w-7xl mx-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 md:p-16 text-center shadow-lg">
-              <h2 className="text-3xl font-bold mb-6 text-white">{t.about_title}</h2>
-              <p className="text-lg text-slate-300 mb-8 leading-relaxed max-w-3xl mx-auto">
+{/* --- ABOUT US SECTION (Direct & Bold) --- */}
+      <section className="py-24 px-6 max-w-7xl mx-auto text-center">
+          <div className="bg-teal-900/20 border-2 border-teal-500/50 rounded-3xl p-10 md:p-20">
+              <h2 className="text-4xl md:text-5xl font-black mb-8 text-white tracking-tight uppercase">
+                  {t.about_title}
+              </h2>
+              <p className="text-xl md:text-2xl text-white font-bold mb-10 leading-relaxed max-w-4xl mx-auto">
                   {t.about_desc}
               </p>
-              <Link href="/about" className="text-teal-400 font-bold hover:text-white transition-colors flex items-center justify-center gap-2 text-lg">
-                  {t.about_btn} <LucideArrowRight className="w-5 h-5" />
+              <Link href="/about" className="inline-block bg-teal-500 text-white text-lg font-bold px-10 py-4 rounded-xl hover:bg-teal-400 transition-transform hover:scale-105 uppercase tracking-wide">
+                  {t.about_btn}
               </Link>
           </div>
       </section>
